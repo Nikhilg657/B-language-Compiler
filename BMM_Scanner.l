@@ -65,9 +65,9 @@ REM {
 RETURN {
     return RETURN;
 }
-
 [\n] {nlines++;}
-[-;+,*/()=]   {return *yytext;}
+[;] {return *yytext;}
+[-+,*/()=]   {return *yytext;}
 [\t] yyerror("tab not allowed");
 %%
 int yywrap(void)

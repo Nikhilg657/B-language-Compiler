@@ -15,21 +15,17 @@
 %start program
 
 %%
-program : line {printf("in program\n");}
-        ;
-
-line    : number statement {printf("in line\n");};
+program : number statement ';' {printf("in PROGRAM\n");}
+    | ;
 number  : INTEGER;
 statement: data {printf("in statement\n");};
 data: DATA data_list {printf("in DATA\n");};
-data_list:
-    data_item {printf("in SINGLE DATA\n");}
-    | data_list COMMA data_item {printf("in DATA LIST MULTIPLE\n");}
+data_list: data_item {printf("in SINGLE DATA\n");}
+    | data_list ',' data_item {printf("in DATA LIST MULTIPLE\n");}
     ;
 
-data_item:
-    INTEGER {printf("in INTEGER\n");}
-    |STRING{printf("in STRING\n");}
+data_item: INTEGER {printf("in INTEGER\n");}
+    |STRING {printf("in STRING\n");}
     ;
 %%
 
