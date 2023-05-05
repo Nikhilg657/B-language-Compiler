@@ -12,20 +12,56 @@
     yylval = atoi(yytext);
     return INTEGER;
     }
-\"([^\\\"]|\\.)*\"  {  return STRING; }
+\"([A-Z]+[\.]?[A-Z]*[!]?[ \t]?[*]?)*\"  {  return STRING; }
 DATA {
      yylval=*yytext;
     return DATA;}
+
 DEF {
+    yylval=*yytext;
     return DEF;
 }
+FN[A-Z]?  {
+    return FN;
+}
+
 DIM {return DIM;}
+
+[A-Z] {yylval=*yytext;
+    return MSS;}
+[A-Z][0-9]?[%]? {
+    yylval=*yytext;
+    return NORVAR; //normal variable
+}
+[A-Z][0-9]?[!] {
+    yylval=*yytext;
+    return SINGLEVAR;
+}
+[A-Z][0-9]?[#] {
+    yylval=*yytext;
+    return DOUBLEVAR;
+}
+[A-Z][0-9]?[$] {
+    yylval=*yytext;
+    return STRVAR;
+}
+[-+]?[0-9]*\.?[0-9]{1,7} {
+    yylval= atof(*yytext);
+    return FLOAT;
+}
+[-+]?[0-9]*\.?[0-9]{1,15} {
+    yylval= atof(*yytext);
+    return DOUBLE;
+}
+
 END {
     return END;
 }
+
 FOR {
     return FOR;
 }
+
 LET {
     return LET;
 }
@@ -65,9 +101,10 @@ REM {
 RETURN {
     return RETURN;
 }
+[><][>=]? {return RELOP;}
+[<][>] {return NE;}
 [\n] {nlines++;}
-[;] {return *yytext;}
-[-+,*/()=]   {return *yytext;}
+[-;+,*/()=~]   {return *yytext;}
 [\t] yyerror("tab not allowed");
 %%
 int yywrap(void)
