@@ -61,14 +61,15 @@
      DATA = 277,
      FLOAT = 278,
      STRING = 279,
-     NORVAR = 280,
-     SINGLEVAR = 281,
-     DOUBLEVAR = 282,
-     STRVAR = 283,
-     RELOP = 284,
-     DOUBLE = 285,
-     NE = 286,
-     FOR = 287
+     REMSTR = 280,
+     NORVAR = 281,
+     SINGLEVAR = 282,
+     DOUBLEVAR = 283,
+     STRVAR = 284,
+     RELOP = 285,
+     DOUBLE = 286,
+     NE = 287,
+     FOR = 288
    };
 #endif
 

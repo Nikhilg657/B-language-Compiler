@@ -13,6 +13,7 @@
     // yylval = atoi(yytext);
     return INTEGER;
     }
+
 \"([A-Z]+[\.]?[A-Z]*[!]?[ \t]?[*]?)*\"  {  return STRING; }
 DATA {
      yylval=*yytext;
@@ -107,6 +108,7 @@ RETURN {
 [><][>=]? {return RELOP;}
 [\n] {nlines++;}
 [\s] {return *yytext;}
+(([*]*[A-Z]*[*]*)?)([A-Z]*) {return REMSTR;}
 %%
 int yywrap(void)
 {

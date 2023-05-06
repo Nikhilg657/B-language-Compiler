@@ -11,7 +11,7 @@
 %token  INTEGER
 %token DATA
 %token FLOAT
-%token  STRING
+%token  STRING REMSTR
 %token NORVAR SINGLEVAR DOUBLEVAR STRVAR RELOP DOUBLE NE FOR
 %left '+' '-'
 %left '*' '/'
@@ -145,10 +145,12 @@ delimiter: ','
         |
         ;
 
-rem: REM STRING
+rem: REM remm
     |REM
     ;
-
+remm: remm REMSTR
+    | REMSTR
+    ;
 got: GOTO number; // must check line number is present in line array
 
 gosub: GOSUB number; // must check line number is present in line array
