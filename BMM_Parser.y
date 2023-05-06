@@ -7,12 +7,12 @@
     extern FILE * yyout;
     int sym[26];
 %}
-%token DEF FN DIM MSS END FOR GOSUB GOTO IF THEN LET INPUT PRINT NEXT TO REM RETURN STOP STEP
+%token DEF FN DIM MSS END GOSUB GOTO IF THEN LET INPUT PRINT NEXT TO REM RETURN STOP STEP
 %token  INTEGER
 %token DATA
 %token FLOAT
 %token  STRING
-%token NORVAR SINGLEVAR DOUBLEVAR STRVAR RELOP DOUBLE NE 
+%token NORVAR SINGLEVAR DOUBLEVAR STRVAR RELOP DOUBLE NE FOR
 %left '+' '-'
 %left '*' '/'
 %start program
@@ -24,7 +24,7 @@ program : line {printf("in program\n");}
 
 line    : number statement {printf("in line\n");};
 number  : INTEGER;
-statement: data|def|dim|end|fo|next|gosub|got|iff|then|let|input|print|stop|rem|returnn {printf("in statement\n");};
+statement: data|def|dim|end|forr|next|gosub|got|iff|let|input|print|stop|rem|returnn {printf("in statement\n");};
 data: DATA data_list {printf("in DATA\n");};
 data_list:
     data_item {printf("in SINGLE DATA\n");}
@@ -38,10 +38,10 @@ data_item:
     |STRING {printf("in STRING\n");}
     ;
 
-def: DEF FN '=' expr {printf("in def");}
-      |DEF FN '('MSS')''=' expr {printf("in def_par\n");}
+def: DEF FN '=' expr
+      |DEF FN '('varname')''=' expr 
 ;
-expr: expr '+' term 
+expr: expr '+' term
     | expr '-' term 
     | term 
     ;
@@ -51,14 +51,15 @@ term: term '*' factor
     ;
 factor:'~' factor 
         | '~' exp 
-        | exp 
+        | exp
         ;
 exp: exp2 '^' exp 
-    | exp2 
+    | exp2
     ;
 exp2: '(' expr ')' 
-    |numbertype
+    |numbertype {printf("in NUMBERTYPE");}
     |MSS 
+    |NORVAR
     |DOUBLEVAR 
     |SINGLEVAR 
     ;
@@ -70,49 +71,63 @@ dimm: dimm ',' MSS '(' intt ')'{printf("in dim");}
 intt: INTEGER ',' INTEGER
     | INTEGER;
 
-fo: FOR varname '=' expr TO expr step
-;
-step: STEP expr
+varname: NORVAR|SINGLEVAR|DOUBLEVAR|MSS;
+forr: FOR varname '=' expr TO expr step{printf("in for");};
+// forexpr:  '=' INTEGER {printf("in forexpr");}
+//     | ;
+// FOREXP: NORVAR '=' INTEGER {printf("in forexp");}
+
+step: STEP expr {printf("in step");}
     |
     ;
 next: NEXT varname; //should come after for, and its varname should be similar to varname of for
 
-iff: IF condn THEN number;
-condn: varname RELOP numbertype
-    | varname '=' numbertype
-    |varname RELOP varname
-    | varname '=' varname
-    |numbertype RELOP numbertype
-    | numbertype '=' numbertype
+para: para ',' vari
+    | vari
+    ;
+vari: varname|INTEGER|FLOAT|DOUBLE
+    ;
+iff: IF condn THEN number
+;
+iffvari: varname  {printf("in iffvari");}
+        | varname '(' para ')' {printf("in iff vari para\n");}
+        ;
+condn: iffvari RELOP expr
+    | iffvari NE expr
+    | iffvari '=' expr {printf("int equal condn");}
+    |iffvari RELOP iffvari
+    |iffvari NE iffvari
+    | iffvari '=' iffvari
+    |expr RELOP expr
+    |expr NE expr
+    | expr '=' expr
     |STRVAR NE STRVAR
     | STRVAR '=' STRVAR
     |STRVAR NE STRING
     | STRVAR '=' STRING
     |STRING NE STRING
-    | STRING '=' STRING;
-varname: NORVAR|SINGLEVAR|DOUBLEVAR;
+    | STRING '=' STRING
+    ;
+    
 
 
 let: LET letcondn ;
 letcondn: NORVAR '=' INTEGER
         | SINGLEVAR '=' FLOAT
+        | DOUBLEVAR '=' DOUBLE
+        | MSS '=' INTEGER
         | NORVAR '=' NORVAR
         | SINGLEVAR '=' SINGLEVAR
-        | DOUBLEVAR '=' DOUBLE
         | DOUBLEVAR '=' DOUBLEVAR
         | STRVAR '=' STRING
         | STRVAR '=' STRVAR
         | varname '(' para ')' '=' expr;
-para: para ',' vari
-    | vari;
-vari: varname|INTEGER|FLOAT|DOUBLE;
 
 input: INPUT inputvar;
 
 inputvar: inputvar ',' inputvari
         | inputvari
-inputvari: varname
-        | varname '(' para ')' 
+inputvari: iffvari 
         | STRVAR;
 
 
