@@ -5,12 +5,12 @@
     void yyerror(char *);
     extern FILE * yyin;
     extern FILE * yyout;
-    int sym[26];
 %}
+
 %token DEF FN DIM MSS END GOSUB GOTO IF THEN LET INPUT PRINT NEXT TO REM RETURN STOP STEP
 %token  INTEGER
 %token DATA
-%token FLOAT
+%token FLOAT AND OR NOT XOR
 %token REMSTR STRING
 %token NORVAR SINGLEVAR DOUBLEVAR STRVAR RELOP DOUBLE NE FOR
 %left '+' '-'
@@ -18,24 +18,25 @@
 %start program
 
 %%
-program : line {printf("in program\n");}
+program : line 
         | program line
         ;
 
-line    : number statement {printf("in line\n");};
+line    : number statement
 number  : INTEGER;
-statement: data|def|dim|end|forr|next|gosub|got|iff|let|input|print|stop|rem|returnn {printf("in statement\n");};
-data: DATA data_list {printf("in DATA\n");};
+statement: data|def|dim|end|forr|next|gosub|got|iff|let|input|print|stop|rem|returnn 
+
+data: DATA data_list 
 data_list:
-    data_item {printf("in SINGLE DATA\n");}
-    | data_list ',' data_item {printf("in DATA LIST MULTIPLE\n");}
+    data_item 
+    | data_list ',' data_item 
     ;
 
 data_item:
-    INTEGER {printf("in INTEGER\n");}
-    |FLOAT {printf("in float\n");}
-    | DOUBLE {printf("in double\n");}
-    |STRING {printf("in STRING\n");}
+    INTEGER 
+    |FLOAT
+    | DOUBLE
+    |STRING
     ;
 
 def: DEF FN '=' expr
@@ -57,44 +58,51 @@ exp: exp2 '^' exp
     | exp2
     ;
 exp2: '(' expr ')' 
-    |numbertype {printf("in NUMBERTYPE");}
+    |numbertype
     |MSS 
     |NORVAR
     |DOUBLEVAR 
     |SINGLEVAR 
     ;
 numbertype: INTEGER|FLOAT|DOUBLE;
+
 dim: DIM dimm;
-dimm: dimm ',' MSS '(' intt ')'{printf("in dim");}
-    | MSS '(' intt ')'{printf("in dim");}
+dimm: dimm ',' MSS '(' intt ')'
+    | MSS '(' intt ')'
     ;
 intt: INTEGER ',' INTEGER
     | INTEGER;
 
 varname: NORVAR|SINGLEVAR|DOUBLEVAR|MSS;
-forr: FOR varname '=' expr TO expr step{printf("in for");};
-// forexpr:  '=' INTEGER {printf("in forexpr");}
-//     | ;
-// FOREXP: NORVAR '=' INTEGER {printf("in forexp");}
+forr: FOR varname '=' expr TO expr step
 
-step: STEP expr {printf("in step");}
+step: STEP expr 
     |
     ;
+
 next: NEXT varname; //should come after for, and its varname should be similar to varname of for
 
 para: para ',' vari
     | vari
     ;
+
 vari: varname|INTEGER|FLOAT|DOUBLE
     ;
+
 iff: IF condn THEN number
-;
-iffvari: varname  {printf("in iffvari");}
-        | varname '(' para ')' {printf("in iff vari para\n");}
+   ;
+
+iffvari: varname 
+        | varname '(' para ')' 
         ;
-condn: iffvari RELOP expr
+
+condn: condn OR condn
+    | condn AND condn
+    | condn XOR condn
+    | NOT condn
+    | iffvari RELOP expr
     | iffvari NE expr
-    | iffvari '=' expr {printf("int equal condn");}
+    | iffvari '=' expr
     |iffvari RELOP iffvari
     |iffvari NE iffvari
     | iffvari '=' iffvari
@@ -109,11 +117,11 @@ condn: iffvari RELOP expr
     | STRING '=' STRING
     ;
 
-
 let: LET letcondn ;
 letcondn: NORVAR '=' INTEGER
         | SINGLEVAR '=' FLOAT
         | DOUBLEVAR '=' DOUBLE
+        | DOUBLEVAR '=' FLOAT
         | MSS '=' INTEGER
         | NORVAR '=' NORVAR
         | SINGLEVAR '=' SINGLEVAR
@@ -126,19 +134,25 @@ input: INPUT inputvar;
 
 inputvar: inputvar ',' inputvari
         | inputvari
-inputvari: iffvari 
-        | STRVAR;
+        ;
 
+inputvari: iffvari 
+        | STRVAR
+        ;
 
 print: PRINT printrec
         | PRINT
         ;
 
 printrec: printrec delimiter printexpr
-        |printrec delimiter
-        | printexpr;
+        | printrec delimiter
+        | printexpr
+        ;
 
-printexpr: STRVAR|varname|expr|STRING;
+printexpr: STRVAR
+        |varname
+        |STRING
+        ;
 
 delimiter: ','
         | ';'
@@ -148,29 +162,32 @@ delimiter: ','
 rem: REM remm
     |REM
     ;
+
 remm: remm REMSTR
     | REMSTR
     ;
-got: GOTO number; // must check line number is present in line array
+got: GOTO number;
 
-gosub: GOSUB number; // must check line number is present in line array
+gosub: GOSUB number;
 
-returnn: RETURN ; //return line no. should come after gosub and before any other gosub
+returnn: RETURN ; 
 
 stop: STOP;
 
-end: END; //it's line number must be last
+end: END; 
+
 %%
+
 void yyerror(char *s) {
     fprintf(stderr, "%s\n", s);
 }
 
 int main(void)
 {
-    // yyin=fopen("input.txt","r");
-    // yyout=fopen("output.txt","w");
+    yyin=fopen("input.txt","r");
+    yyout=fopen("output.txt","w");
     yyparse();
-    // fclose(yyin);
-    // fclose(yyout);
+    fclose(yyin);
+    fclose(yyout);
     return 0;
 }

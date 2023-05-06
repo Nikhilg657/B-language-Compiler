@@ -8,15 +8,23 @@
 %}
 
 %%
-[-;+,*/^()=~]   {return *yytext;}
+[-;+,*/^()=~]   {
+    return *yytext;
+}
+
 [0-9]+ {
     // yylval = atoi(yytext);
     return INTEGER;
-    }
-\"([A-Z]+[\.]?[A-Z]*[!$#=]*[ \t]*[*]?)*\"  {  return STRING; }
+}
+
+\"([A-Z]+[\.]?[A-Z]*[!$#=]*[ \t]*[*]?)*\"  {  
+    return STRING; 
+}
+
 DATA {
-     yylval=*yytext;
-    return DATA;}
+    yylval=*yytext;
+    return DATA;
+}
 
 DEF {
     yylval=*yytext;
@@ -32,28 +40,36 @@ FOR {
     return FOR;
 }
 
-[A-Z] {yylval=*yytext;
-    return MSS;}
+[A-Z] {
+    yylval=*yytext;
+    return MSS;
+}
+
 [0-9]*[\.]?[0-9]{1,7} {
     // yylval= atof(*yytext);
     return FLOAT;
 }
+
 [0-9]*\.?[0-9]{1,15} {
     // yylval= atof(*yytext);
     return DOUBLE;
 }
+
 [A-Z][0-9]?[%]? {
     yylval=*yytext;
     return NORVAR; //normal variable
 }
+
 [A-Z][0-9]?[!] {
     yylval=*yytext;
     return SINGLEVAR;
 }
+
 [A-Z][0-9]?[#] {
     yylval=*yytext;
     return DOUBLEVAR;
 }
+
 [A-Z][0-9]?[$] {
     yylval=*yytext;
     return STRVAR;
@@ -62,7 +78,6 @@ FOR {
 END {
     return END;
 }
-
 
 LET {
     return LET;
@@ -103,11 +118,34 @@ REM {
 RETURN {
     return RETURN;
 }
-[<][>] {return NE;}
-[><][>=]? {return RELOP;}
-[\n] {nlines++;}
-[\s] {return *yytext;}
-(([*]*[A-Z]*[*]*[#!@%^&]*)?)([A-Z]*) {return REMSTR;}
+AND {
+    return AND;
+}
+OR {
+     return OR;
+}
+NOT {
+    return NOT;
+}
+XOR {
+    return XOR;
+}
+[<][>] {
+    return NE;
+}
+[><][>=]? {
+    return RELOP;
+}
+[\n] {
+    nlines++;
+}
+[\s] {
+    return *yytext;
+}
+(([*]*[A-Z]*[*]*[#!@%^&?]*)?)([A-Z]*) {
+    return REMSTR;
+}
+
 %%
 int yywrap(void)
 {
