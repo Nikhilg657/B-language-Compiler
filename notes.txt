@@ -1,1 +1,0 @@
-flex BMM_scanner.l ; bison -d  BMM_parser.y ; gcc lex.yy.c BMM_parser.tab.c;
