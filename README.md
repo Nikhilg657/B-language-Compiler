@@ -3,7 +3,7 @@ ENTRY NO. 2021CSB1114 , 2021CSB1067
 There are 7 files in the folder those are:
 
     1. BMM_Parser.y - It will parse the given code 
-    2. BMM_Scanner.l - It will parse the given code
+    2. BMM_Scanner.l - It will scan the given code
     3. CorrectSample.bmm - It contains a sample of code without any error
     4. IncorrectSample.bmm - It contans code with error
     5. input.txt - The code to be compiled should be written here
